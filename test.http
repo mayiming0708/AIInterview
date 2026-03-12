@@ -1,5 +1,24 @@
-### GET request to example server
-GET https://examples.http-client.intellij.net/get
-    ?generated-in=IntelliJ IDEA
+### 准备阶段
+POST http://localhost:8000/interview/prepare
+Content-Type: application/json
 
-###
+{
+  "jd": "这是一个AI智能体构建的岗位，需要可以熟练使用langgraph",
+  "resume": "张三，本科学历，计算机专业，有多个智能体构建落地经验"
+}
+
+### 面试阶段（第一次answer可以为打招呼激活）
+POST http://localhost:8000/interview/fb2b5df4-b0d4-4886-8a62-06656f669574/next
+Content-Type: application/json
+
+{
+  "last_answer": "您好"
+}
+
+
+### 评估阶段
+POST http://localhost:8000/interview/fb2b5df4-b0d4-4886-8a62-06656f669574/evaluate
+Content-Type: application/json
+
+{
+}

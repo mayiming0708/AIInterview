@@ -4,11 +4,14 @@
 # @Name    : model_client.py
 # @Author  : mayiming
 import json
+import logging
 
+from configs.model_config import MODEL_CONFIGS, FALLBACK_MODEL, PRICE
 from openai import OpenAI
 from openai.types.shared_params import ResponseFormatJSONObject
 
-from src.configs.model_config import MODEL_CONFIGS, FALLBACK_MODEL
+logger = logging.getLogger(__file__)
+
 
 # token统计：当前使用的大模型返回token计算，只是做了提取，未使用，若多个不同种类模型，可以使用tiktoken库计算
 # 面试成本：根据模型不同成本可能不同，以当前配置计算。
@@ -27,6 +30,7 @@ class ModelClient:
         )
 
     def invoke(self, system_prompt, history=None, user_prompt=None):
+        logger.info(f"start call model {self.model_config.model_name}")
         system_message = {
             "role": "system",
             "content": system_prompt,
@@ -49,6 +53,7 @@ class ModelClient:
                 response_format=ResponseFormatJSONObject(type="json_object"),
             )
         except OpenAIError as e:
+            logger.warning(f"{self.model_config.model_name} failed: {e}, trying fallback model")
             self.model_config = FALLBACK_MODEL
             self.client = OpenAI(
                 api_key=self.model_config.api_key,
@@ -64,8 +69,13 @@ class ModelClient:
         content = json.loads(response.choices[0].message.content)
         # 不同模型tokens统计方法可采用tiktoken组件计算，当前只使用了接口调用返回的token计算
         usage_info = response.usage
+        logger.info(f"end call model {self.model_config.model_name}, cost token {usage_info.total_tokens}")
+
+        # 总成本可以分开算输入和输出，价格不一样, 这里只是假设一致简单计算了
+        # 若需计算每个面试所消耗可以缓存cost，使用interview_id做key，做累计。时间原因未实现
+        cost = usage_info.total_tokens * PRICE[self.model_config.model_name] / 1000
         return {
             "content": content,
-            "prompt_tokens": usage_info.prompt_tokens,
-            "completions_tokens": usage_info.completion_tokens
+            "total_tokens": usage_info.total_tokens,
+            "cost": cost,
         }

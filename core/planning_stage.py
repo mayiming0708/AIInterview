@@ -5,12 +5,12 @@
 # @Author  : mayiming
 import hashlib
 
-from src.configs.prompt_template import PROMPT_TEMPLATES
-from src.constants.prompt import PLANNING_PROMPT
-from src.constants.stage import PLANNING_STAGE
-from src.models.model_client import ModelClient
-from src.schema.prepare import PrepareResponse
-from src.utils.cache import caches
+from configs.prompt_template import PROMPT_TEMPLATES
+from constants.prompt import PLANNING_PROMPT
+from constants.stage import PLANNING_STAGE
+from models.model_client import ModelClient
+from schema.prepare import PrepareResponse
+from utils.cache import caches
 
 
 class PlanningStage:

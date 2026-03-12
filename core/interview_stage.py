@@ -4,14 +4,14 @@
 # @Name    : interview_stage.py
 # @Author  : mayiming
 import os
-from typing import List, Any
+from fastapi import HTTPException
 
-from src.configs.prompt_template import PROMPT_TEMPLATES
-from src.constants.prompt import INTERVIEW_PROMPT
-from src.constants.stage import INTERVIEW_STAGE
-from src.models.model_client import ModelClient
-from src.schema.interview import InterviewResponse, InterviewRequest
-from src.utils.cache import caches
+from configs.prompt_template import PROMPT_TEMPLATES
+from constants.prompt import INTERVIEW_PROMPT
+from constants.stage import INTERVIEW_STAGE
+from models.model_client import ModelClient
+from schema.interview import InterviewResponse, InterviewRequest
+from utils.cache import caches
 
 
 class InterviewStage:
@@ -20,10 +20,12 @@ class InterviewStage:
 
     def interview(self, interview_id, interview_request: InterviewRequest):
         cache = caches.get(interview_id)
+        if cache is None:
+            raise HTTPException(status_code=404, detail="Interview not found")
 
         interview_prompt = PROMPT_TEMPLATES.get(INTERVIEW_PROMPT).format(
             interview_plan=cache["plan"],
-            max_turns=os.getenv("MAX_TURNS"),
+            max_turns=os.getenv("MAX_TURNS", 5),
         )
 
         history_id = "messages:" + interview_id

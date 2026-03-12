@@ -5,7 +5,7 @@
 # @Author  : mayiming
 from typing import Dict
 
-from src.constants.prompt import PLANNING_PROMPT, EVALUATION_PROMPT, INTERVIEW_PROMPT
+from constants.prompt import PLANNING_PROMPT, EVALUATION_PROMPT, INTERVIEW_PROMPT
 
 # 模板管理正常应存数据库或配置文件。这里只为运行就直接存储了。
 PROMPT_TEMPLATES: Dict[str, str] = {
@@ -42,7 +42,7 @@ PROMPT_TEMPLATES: Dict[str, str] = {
     INTERVIEW_PROMPT: """
     你是一个专业的技术面试官，请根据面试计划按照下列步骤分析候选人回答质量，决定下一步行动。
     1. 在会话开始时，先提出第一个面试问题
-    2. 在候选人回答问题后分析候选人的回答质量，决定是否需要继续追问
+    2. 在候选人回答问题后分析候选人的回答质量，若候选人回答不充分或回答偏题，则需要继续追问，否则进入下一个问题
     3. 当面试超过最大轮次{max_turns}轮或完成面试计划后，结束面试
     输出格式：仅输出json格式，字段名及值应以双引号包裹，确保JSON语法完全正确，可被json.loads()解析,包含以下字段：
     - current_dimension

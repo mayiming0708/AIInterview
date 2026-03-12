@@ -3,12 +3,13 @@
 # @Time    : 2026/3/9 15:25
 # @Name    : evaluation_stage.py
 # @Author  : mayiming
-from src.configs.prompt_template import PROMPT_TEMPLATES
-from src.constants.prompt import EVALUATION_PROMPT
-from src.constants.stage import EVALUATION_STAGE
-from src.models.model_client import ModelClient
-from src.schema.evaluation import EvaluationResponse, EvaluationRequest
-from src.utils.cache import caches
+from fastapi import HTTPException
+from configs.prompt_template import PROMPT_TEMPLATES
+from constants.prompt import EVALUATION_PROMPT
+from constants.stage import EVALUATION_STAGE
+from models.model_client import ModelClient
+from schema.evaluation import EvaluationResponse, EvaluationRequest
+from utils.cache import caches
 
 
 class EvaluationStage:
@@ -17,6 +18,9 @@ class EvaluationStage:
 
     def evaluate(self, interview_id: str):
         cache = caches.get(interview_id)
+        if cache is None:
+            raise HTTPException(status_code=404, detail="Interview not found")
+
         evaluation_prompt = PROMPT_TEMPLATES.get(EVALUATION_PROMPT).format(
             jd_content=cache["jd"],
             resume_content=cache["resume"],
